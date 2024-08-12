@@ -1,0 +1,157 @@
+Create database coronavirus;
+select *
+from coronavirus_table;
+
+-- Q1. Write a code to check NULL values
+SELECT *
+FROM coronavirus_table
+WHERE Province IS NULL
+OR `Country/Region` IS NULL
+OR Latitude IS NULL
+OR Longitude IS NULL
+OR `Date` IS NULL
+OR Confirmed IS NULL
+OR Deaths IS NULL
+OR Recovered IS NULL;
+#NO NULL VALUE WAS FOUND
+
+-- Q3. check total number of rows
+SELECT COUNT(*) AS NUM_OF_ROWS
+FROM coronavirus_table;
+
+-- Q4. Check what is start_date and end_date
+describe coronavirus_table;
+
+UPDATE coronavirus_table
+SET `DATE` = STR_TO_DATE(`DATE`, '%d-%m-%Y')
+WHERE `DATE` LIKE '%-%-%';
+
+UPDATE coronavirus_table
+SET `DATE` = STR_TO_DATE(`DATE`, '%m/%d/%Y')
+WHERE `DATE` LIKE '%/%/%';
+
+ALTER TABLE `coronavirus_table` 
+MODIFY `Date` DATE; 
+
+describe coronavirus_table;
+
+SELECT MIN(`Date`)
+FROM coronavirus_table;
+
+SELECT MAX(`Date`)
+FROM coronavirus_table;
+
+-- Q5. Number of month present in dataset
+SELECT *
+FROM coronavirus_table;
+
+SELECT COUNT(DISTINCT CONCAT(YEAR(`Date`), '-', MONTH(`Date`))) AS num_months
+FROM `coronavirus_table`;
+
+-- Q6. Find monthly average for confirmed, deaths, recovered
+SELECT YEAR(`Date`), MONTH(`Date`),
+AVG( Confirmed) AS Avg_confirmed,
+AVG(Deaths) AS AVG_deaths,
+AVG(Recovered) AS Avg_recovered
+FROM coronavirus_table
+GROUP BY YEAR(`Date`), MONTH(`Date`);
+
+-- Q7. Find most frequent value for confirmed, deaths, recovered each month
+#CONFIRMED_FREQUENCY
+SELECT confirmed, COUNT(confirmed) AS C_frequency, MONTH(`Date`), YEAR(`Date`)
+FROM coronavirus_table
+GROUP BY YEAR(`Date`), MONTH(`Date`), confirmed
+ORDER BY C_frequency DESC
+LIMIT 1;
+
+#DEATHS_FREQUENCY
+SELECT deaths, COUNT(deaths) AS D_frequency, MONTH(`Date`), YEAR(`Date`)
+FROM coronavirus_table
+GROUP BY YEAR(`Date`), MONTH(`Date`), deaths
+ORDER BY D_frequency DESC
+LIMIT 1;
+
+#RECOVERED_FREQUENCY
+SELECT recovered, COUNT(recovered) AS R_frequency, MONTH(`Date`), YEAR(`Date`)
+FROM coronavirus_table
+GROUP BY YEAR(`Date`), MONTH(`Date`), recovered
+ORDER BY R_frequency DESC
+LIMIT 1;
+
+-- Q8. Find minimum values for confirmed, deaths, recovered per year
+SELECT YEAR(`Date`) AS Year,
+MIN(confirmed) AS min_confirmed,
+MIN(deaths) AS min_deaths,
+MIN(recovered) AS min_recovered
+FROM coronavirus_table
+GROUP BY YEAR(`Date`);
+
+-- Q9. Find maximum values of confirmed, deaths, recovered per year
+SELECT YEAR(`Date`) AS Year,
+MAX(confirmed) AS max_confirmed,
+MAX(deaths) AS max_deaths,
+MAX(recovered) AS max_recovered
+FROM coronavirus_table
+GROUP BY YEAR(`Date`);
+
+-- Q10. The total number of case of confirmed, deaths, recovered each month
+SELECT YEAR(`Date`) AS Year, MONTH(`Date`) AS Month,
+SUM(confirmed) AS Total_confirmed,
+SUM(deaths) AS Total_deaths,
+SUM(recovered) AS Total_recovered
+FROM coronavirus_table
+GROUP BY  YEAR(`Date`), MONTH(`Date`);
+
+-- Q11. Check how corona virus spread out with respect to confirmed case
+--      (Eg.: total confirmed cases, their average, variance & STDEV )
+
+SELECT `Date`,
+SUM(confirmed) AS Total_confirmed,
+AVG(confirmed) AS Avg_confirmed,
+Variance(confirmed) AS variance_confirmed,
+stddev(confirmed) AS STDEV_confirmed
+FROM coronavirus_table
+GROUP BY `Date`;
+
+-- Q12. Check how corona virus spread out with respect to death case per month
+--      (Eg.: total confirmed cases, their average, variance & STDEV )
+
+SELECT YEAR(`Date`), MONTH(`Date`),
+SUM(deaths) AS Total_deaths,
+AVG(deaths) AS Avg_deaths,
+Variance(deaths) AS variance_deaths,
+stddev(deaths) AS STDEV_deaths
+FROM coronavirus_table
+GROUP BY YEAR(`Date`), MONTH(`Date`);
+
+-- Q13. Check how corona virus spread out with respect to recovered case
+--      (Eg.: total confirmed cases, their average, variance & STDEV )
+
+SELECT `Date`,
+SUM(recovered) AS Total_Recovered,
+AVG(recovered) AS Avg_recovered,
+Variance(recovered) AS variance_recovered,
+stddev(recovered) AS STDEV_recovered
+FROM coronavirus_table
+GROUP BY `Date`;
+
+-- Q14. Find Country having highest number of the Confirmed case
+SELECT SUM(confirmed), `Country/Region`
+FROM coronavirus_table
+GROUP BY `Country/Region`
+ORDER BY SUM(confirmed) DESC
+LIMIT 1;
+
+-- Q15. Find Country having lowest number of the death case
+SELECT SUM(Deaths), `Country/Region`
+FROM coronavirus_table
+GROUP BY `Country/Region`
+ORDER BY SUM(Deaths) ASC
+LIMIT 1;
+
+-- Q16. Find top 5 countries having highest recovered case
+SELECT SUM(Recovered), `Country/Region`
+FROM coronavirus_table
+GROUP BY `Country/Region`
+ORDER BY SUM(Recovered) DESC
+LIMIT 5;
